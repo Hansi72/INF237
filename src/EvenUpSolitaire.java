@@ -7,15 +7,19 @@ public class EvenUpSolitaire {
     public static void main(String[] args) {
         EvenUpSolitaire.Kattio io = new EvenUpSolitaire.Kattio(System.in, System.out);
 
-        LinkedList<Integer> cards = new LinkedList<>();
+        LinkedList<Boolean> cards = new LinkedList<>();
         io.getInt();
         while (io.hasMoreTokens()) {
-            cards.add(io.getInt() % 2);
+            if(io.getInt() % 2 == 0){
+                cards.add(true);
+            }else{
+                cards.add(false);
+            }
         }
 
-        int currentCard;
+        boolean currentCard;
         int lastSize = cards.size() + 1;
-        ListIterator<Integer> iter;
+        ListIterator<Boolean> iter;
         while (cards.size() < lastSize) {
             iter = cards.listIterator();
             lastSize = cards.size();
