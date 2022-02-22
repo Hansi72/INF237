@@ -6,52 +6,31 @@ public class Spiderman {
     static HashMap<LinkedList<Integer>, int[]> memoized = new HashMap();
 
     public static void main(String[] args) {
-/*
+
         int tasks = io.getInt();
-        for(int i = 0; i < tasks; i++){
+        for (int i = 0; i < tasks; i++) {
             int climbs = io.getInt();
-            Stack<Integer> heights = new Stack();
-            for(int k = 0; k < climbs; k++){
+            LinkedList<Integer> heights = new LinkedList();
+            for (int k = 0; k < climbs; k++) {
                 heights.push(io.getInt());
             }
-            printAnswer(climb(heights, heights.peek()));
-
+            printAnswer(climb(heights));
         }
-*/
-        LinkedList<Integer> st1 = new LinkedList();
-        st1.push(20);
-        st1.push(20);
-        st1.push(20);
-        st1.push(20);
-
-        int[] result = climb(st1);
-
-        //printAnswer(result);
-
-        for(int i:result) {
-            System.out.print(i + ", " );
-        }System.out.println("");
-
-        System.out.println("memosize "+ memoized.size());
-        System.out.println(memoized);
-
         io.close();
-
     }
 
-    static void printAnswer(LinkedList<Integer> result) {
+    static void printAnswer(int[] result) {
         if (result == null) {
             io.println("IMPOSSIBLE");
         } else {
-            //io.print("U");
-            while(result.size() > 2){
-                if (result.pop() > result.peek()) {
+            io.print("U");
+            for (int i = 1; i < result.length - 1; i++) {
+                if (result[i - 1] > result[i]) {
                     io.print("D");
                 } else {
                     io.print("U");
                 }
             }
-            //io.print("D");
             io.println("");
         }
 
@@ -71,82 +50,30 @@ public class Spiderman {
         if (heights.peek() < 0) {
             return null;
         }
-        if(memoized.containsKey(heights)) {
 
-            if (memoized.get(heights) != null) {
-                System.out.println("---------------start-----------------");
-                System.out.println("Currently at::::  Heights");
-                for (int i = 0; i < heights.size(); i++) {
-                    System.out.print(heights.get(i) + ", ");
-                }
-                System.out.println("");
-
-                System.out.println("and returning MEMO, results");
-                for (int i = 0; i < memoized.get(heights).length; i++) {
-                    System.out.print(memoized.get(heights)[i] + ", ");
-                }
-                System.out.println("");
-                System.out.println("---------------end-----------------");
-                return memoized.get(heights);
-            }
-            return null;
+        if (memoized.containsKey(heights)) {
+            return memoized.get(heights);
         }
 
+        LinkedList<Integer> up = new LinkedList((LinkedList) heights.clone());
+        LinkedList<Integer> down = new LinkedList((LinkedList) heights.clone());
+        up.push(up.pop() + up.pop());
+        down.push(down.pop() - down.pop());
 
-
-        //create return array
-        int[] result;
-
-        LinkedList<Integer> upStack = new LinkedList((LinkedList) heights.clone());
-        LinkedList<Integer> downStack = new LinkedList((LinkedList) heights.clone());
-
-        upStack.push(upStack.pop() + upStack.pop());
-        downStack.push(downStack.pop() - downStack.pop());
-
-        result = leastHeighted(climb(downStack), climb(upStack));
+        int[] result = leastHeighted(climb(down), climb(up));
 
         if (result == null) {
             memoized.put(heights, null);
             return null;
         }
-        System.out.print("result :");// + heights.peek() + ", ");
-        for(int i = 0; i < result.length; i++){
-            System.out.print(result[i]+ ", ");
-        }System.out.println("");
 
-
-        int currentHeight = heights.peek();
-        if(result[result.length-1] < currentHeight){
-            result[result.length-1] = heights.peek(); //todo denne lagrer en referanse istedenfor intValue();
-        }
-
-
-        System.out.println("heigths :" + heights.toString());
-        //System.out.println("output :" + currentHeight + ", "+ result.toString());
-
-        memoized.put(heights, new int[result.length+1]);
+        memoized.put(heights, new int[result.length + 1]);
         memoized.get(heights)[0] = heights.peek();
-        for(int i = 0; i < result.length; i++){
-            //while(!output.isEmpty()){
-            memoized.get(heights)[i+1] = result[i];
+        for (int i = 0; i < result.length - 1; i++) {
+            memoized.get(heights)[i + 1] = result[i];
         }
+        memoized.get(heights)[memoized.get(heights).length - 1] = Math.max(heights.peek(), result[result.length - 1]);
 
-
-        //System.out.println("memoized: "+ memoized.toString());
-
-
-
-        for(LinkedList<Integer> key:memoized.keySet()){
-            if(memoized.get(key) !=  null){
-                System.out.print(key + " = " );
-            for(int i: memoized.get(key)) {
-                System.out.print(i + ", ");
-            }}
-            System.out.println("");
-        }
-
-
-        System.out.println("-----------------------");
         return memoized.get(heights);
     }
 
@@ -158,7 +85,7 @@ public class Spiderman {
             return stack1;
         }
 
-        if (stack1[stack1.length-1] < stack2[stack2.length-1]) {
+        if (stack1[stack1.length - 1] < stack2[stack2.length - 1]) {
             return stack1;
         } else {
             return stack2;
