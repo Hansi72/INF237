@@ -1,6 +1,6 @@
 import java.io.*;
-import java.util.LinkedList;
-import java.util.StringTokenizer;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class RestaurantOrders {
     static RestaurantOrders.Kattio io = new RestaurantOrders.Kattio(System.in, System.out);
@@ -30,11 +30,6 @@ public class RestaurantOrders {
                 order[targetIndex].peek()[0] = menu[menuIndex];
             }
             for (int orderIndex = 1; orderIndex < order.length; orderIndex++) {
-                //end early if ambiguous
-                if(order[order.length-1] != null){
-                if(order[order.length-1].size() > 2){
-                    break;
-                }}
                 if (order[orderIndex] != null) {
                     //menuloop
                     for (int menuIndex = 0; menuIndex < menu.length; menuIndex++) {
@@ -55,7 +50,8 @@ public class RestaurantOrders {
                         }
                     }
                 }
-                //fixme remove me
+/*
+//fixme remove me
                 System.out.println("-----------  orderIndex::" + orderIndex);
                 for (int i = 0; i < order.length; i++) {
                     System.out.print("current order[" + i + "] = [");
@@ -71,20 +67,41 @@ public class RestaurantOrders {
                     System.out.println("]");
                 }
                 //fixme remove me
+*/
+
             }
 
+            if (order[order.length - 1] != null) {
+                //io.println("task: " + taskIndex + " finished size = " + order[order.length - 1].size());
 
-            if(order[order.length-1] != null){
-                System.out.println("task: " +taskIndex+" finished size = " + order[order.length-1].size());
-            if(order[order.length-1].size() < 4){
-                for(int i =0; i < order[order.length-1].peekLast().length-1;i++){
-                    io.print(order[order.length-1].peekLast()[i] + " ");
+
+
+
+
+                LinkedList<int[]> solution = order[order.length - 1];
+                HashMap<String, Integer> map = new HashMap();
+                for(int[] i : solution){
+                    Arrays.sort(i);
+                    //todo temp
+                    List<Integer> listTest = Arrays.stream(i).boxed().toList();
+                    //todo temp
+                    //io.println("map put" + listTest.hashCode());
+                    map.put(listTest.toString(), 0);
                 }
-                //io.println(order[order.length-1].peekLast()[order[order.length-1].peekLast().length-1]);
-            }else{
-                io.println("Ambiguous");
-            }
-            }else{
+
+//io.println("mapsize=" + map.size());
+
+
+                if (map.size() < 2) {
+                    //io.println("");
+                    for (int i = 0; i < solution.peek().length - 1; i++) {
+                        io.print(Arrays.binarySearch(menu, solution.peek()[i]) +1 + " ");
+                    }
+                    io.print(Arrays.binarySearch(menu, solution.peek()[solution.size() - 1]) +1);
+                } else {
+                    io.println("Ambiguous");
+                }
+            } else {
                 io.println("Impossible");
             }
 
