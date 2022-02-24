@@ -16,19 +16,26 @@ public class RestaurantOrders {
         }
 
 
-        int tasks = io.getInt();
+        int[] tasks = new int[io.getInt()];
+        int maxTask = 0;
+        for (int taskIndex = 0; taskIndex < tasks.length; taskIndex++) {
+            int task = io.getInt();
+            if(task > maxTask){maxTask = task;}
+            tasks[taskIndex] = task;
+        }
 
-        for (int taskIndex = 0; taskIndex < tasks; taskIndex++) {
-            LinkedList<int[]>[] order = new LinkedList[io.getInt() + 1];
+
+            LinkedList<HashSet<ArrayList<Integer>>>[] order = new LinkedList[maxTask+1];
             order[0] = new LinkedList();
 
             //fill first targetIndexes
             for (int menuIndex = 0; menuIndex < menu.length; menuIndex++) {
                 targetIndex = menu[menuIndex];
-                order[targetIndex] = new LinkedList<int[]>();
-                order[targetIndex].push(new int[1]);
-                order[targetIndex].peek()[0] = menu[menuIndex];
+                order[targetIndex] = new LinkedList<ArrayList<Integer>>();
+                order[targetIndex].push(new ArrayList<Integer>(2));
+                order[targetIndex].peek().add(menu[menuIndex]);
             }
+            //orderLoop
             for (int orderIndex = 1; orderIndex < order.length; orderIndex++) {
                 if (order[orderIndex] != null) {
                     //menuloop
@@ -37,20 +44,20 @@ public class RestaurantOrders {
                         targetIndex = menu[menuIndex] + orderIndex;
                         if (targetIndex < order.length) {
                             if (order[targetIndex] == null) {
-                                order[targetIndex] = new LinkedList<int[]>();
+                                order[targetIndex] = new LinkedList<ArrayList<Integer>>();
                             }
                             //push orderIndex arrays to targetIndex
-                            for (int[] orderList : order[orderIndex]) {
-                                order[targetIndex].push(new int[orderList.length + 1]);
-                                for (int i = 0; i < orderList.length; i++) {
-                                    order[targetIndex].peek()[i] = orderList[i];
+                            for (ArrayList<Integer> orderList : order[orderIndex]) {
+                                order[targetIndex].push(new ArrayList<Integer>(orderList.size() + 1));
+                                for (int i = 0; i < orderList.size(); i++) {
+                                    order[targetIndex].peek().add(i, orderList.get(i));
                                 }
-                                order[targetIndex].peek()[order[targetIndex].peek().length - 1] = menu[menuIndex];
+                                order[targetIndex].peek().set((order[targetIndex].peek().size() - 1), menu[menuIndex]);
                             }
                         }
                     }
                 }
-/*
+
 //fixme remove me
                 System.out.println("-----------  orderIndex::" + orderIndex);
                 for (int i = 0; i < order.length; i++) {
@@ -67,7 +74,7 @@ public class RestaurantOrders {
                     System.out.println("]");
                 }
                 //fixme remove me
-*/
+
 
             }
 
@@ -78,15 +85,14 @@ public class RestaurantOrders {
 
 
 
-                LinkedList<int[]> solution = order[order.length - 1];
+                LinkedList<ArrayList<Integer>> solution = order[order.length - 1];
                 HashMap<String, Integer> map = new HashMap();
-                for(int[] i : solution){
-                    Arrays.sort(i);
+                for(ArrayList<Integer> i : solution){
+                    Collections.sort(i);
                     //todo temp
-                    List<Integer> listTest = Arrays.stream(i).boxed().toList();
                     //todo temp
                     //io.println("map put" + listTest.hashCode());
-                    map.put(listTest.toString(), 0);
+                    map.put(i.toString(), 0);
                 }
 
 //io.println("mapsize=" + map.size());
@@ -94,10 +100,10 @@ public class RestaurantOrders {
 
                 if (map.size() < 2) {
                     //io.println("");
-                    for (int i = 0; i < solution.peek().length - 1; i++) {
-                        io.print(Arrays.binarySearch(menu, solution.peek()[i]) +1 + " ");
+                    for (int i = 0; i < solution.peek().size() - 1; i++) {
+                        io.print(Arrays.binarySearch(menu, solution.peek().get(i)) +1 + " ");
                     }
-                    io.print(Arrays.binarySearch(menu, solution.peek()[solution.size() - 1]) +1);
+                    io.print(Arrays.binarySearch(menu, solution.peek().get(solution.size() - 1)+1));
                 } else {
                     io.println("Ambiguous");
                 }
@@ -106,7 +112,7 @@ public class RestaurantOrders {
             }
 
 
-        }
+
         io.close();
     }
 
