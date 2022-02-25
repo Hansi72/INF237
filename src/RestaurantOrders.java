@@ -7,6 +7,7 @@ public class RestaurantOrders {
     static int[][] dp;
     static int[] menu;
     static HashMap<Integer, Integer> unSortedMenu;
+    static int negativeOffset;
 
     public static void main(String[] args) {
 
