@@ -1,26 +1,31 @@
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
-
+import java.util.stream.IntStream;
 
 public class RestaurantOrders {
     static RestaurantOrders.Kattio io = new RestaurantOrders.Kattio(System.in, System.out);
-    static int[][] dp;
-    static int[] menu;
-    static HashMap<Integer, Integer> unSortedMenu;
-    static int negativeOffset;
+    static int targetIndex;
+    static boolean[] ambiguous;
 
     public static void main(String[] args) {
 
-        int menuLen = io.getInt();
-        menu = new int[menuLen];
-        unSortedMenu = new HashMap<>();
+        int menu[] = new int[io.getInt()];
+        HashSet<Integer> menuDuplicates = new HashSet<>();
+        HashSet<Integer> dupCheck = new HashSet();
 
+        int menuItem;
+        int dupCount = 0;
         for (int i = 0; i < menu.length; i++) {
-            int menuItem = io.getInt();
+            menuItem = io.getInt();
             menu[i] = menuItem;
-            unSortedMenu.put(menuItem, i+1);
+            dupCheck.add(menuItem);
+            if(dupCheck.size()-1 + dupCount < i){
+                dupCount++;
+                menuDuplicates.add(menuItem);
+            }
         }
-        Arrays.sort(menu);
+
 
         int[] tasks = new int[io.getInt()];
         int maxTask = 0;
@@ -32,82 +37,102 @@ public class RestaurantOrders {
             tasks[taskIndex] = task;
         }
 
-        dp = new int[menu.length + 1][maxTask + 1];
+        ambiguous = new boolean[maxTask + 1];
+        HashSet<ArrayList<Integer>>[] orders = new HashSet[maxTask + 1];
+        orders[0] = new HashSet<>();
 
-        //initialize array, resten er false by default
-        for (int i = 0; i < menu.length + 1; i++) {
-            dp[i][0] = 1;
+        //fill first targetIndexes
+        for (int menuIndex = 0; menuIndex < menu.length; menuIndex++) {
+            targetIndex = menu[menuIndex];
+
+            if (orders.length - 1 < targetIndex) {
+                continue;
+            }
+            orders[targetIndex] = new HashSet<>();
+
+            ArrayList<Integer> newOrder = new ArrayList<Integer>(menu.length);
+            for (int i = 0; i < menu.length; i++) {
+                newOrder.add(0);
+            }
+            newOrder.set(menuIndex, 1);
+
+            orders[targetIndex] = new HashSet<>();
+            orders[targetIndex].add(newOrder);
         }
 
-        for (int menuIndex = 1; menuIndex < menu.length + 1; menuIndex++) {
-            for (int target = 1; target < maxTask + 1; target++) {
-                int itemPrice = menu[menuIndex - 1];
+        //orderLoop
+        for (int orderIndex = 1; orderIndex < orders.length; orderIndex++) {
+            if (orders[orderIndex] == null) {
+                continue;
+            }
+            if (orders[orderIndex].size() > 1) {
+                ambiguous[orderIndex] = true;
+            }
 
-                //hvis den "over" er true, sett til true.
-                dp[menuIndex][target] = dp[menuIndex][target] + dp[menuIndex - 1][target];
 
-                //skip om target er out of bounds
-                if ((target - itemPrice < 0)) {
+            //menuloop
+            for (int menuIndex = 0; menuIndex < menu.length; menuIndex++) {
+                targetIndex = menu[menuIndex] + orderIndex;
+                //if target is out of bounds
+                if (orders.length - 1 < targetIndex) {
                     continue;
                 }
-                //legg til den som ligger itemPrice til venstre i arrayet
-                dp[menuIndex][target] = dp[menuIndex][target] + dp[menuIndex][target - itemPrice];
+
+                if (orders[targetIndex] == null) {
+                    orders[targetIndex] = new HashSet<>();
+                }
+
+                if (ambiguous[orderIndex]) {
+                    ambiguous[targetIndex] = true;
+                } else {
+                    //todo loop through all arrays in orderIndex hashSet, copy and add +1 to current menuitem (set as ambiguous if current is ambiguous)
+                    for (ArrayList<Integer> order : orders[orderIndex]) {
+                        ArrayList<Integer> newOrder = new ArrayList<>(menu.length);
+                        for (int i = 0; i < menu.length; i++) {
+                            newOrder.add(order.get(i));
+                        }
+                        newOrder.set(menuIndex, newOrder.get(menuIndex) + 1);
+                        orders[targetIndex].add(newOrder);
+                    }
+                }
             }
         }
         //print answer
-        for (int task = 0; task < tasks.length; task++) {
-            if (dp[menu.length][tasks[task]] == 0) {
-                if (task == tasks.length - 1) {
-                    System.out.print("Impossible");
-                } else {
-                    System.out.println("Impossible");
-                }
-            } else if (dp[menu.length][tasks[task]] > 1) {
-                if (task == tasks.length - 1) {
-                    System.out.print("Ambiguous");
-                } else {
-                    System.out.println("Ambiguous");
-                }
-            } else {
-                int[] solution = getAnswer(tasks[task], menu.length, new int[0]);
-                boolean first = true;
-                int[] solutionIndexes = new int[solution.length];
-                for (int i = 0; i < solution.length; i++) {
-                   solutionIndexes[i] = unSortedMenu.get(solution[i]);
-                }
-                Arrays.sort(solutionIndexes);
-                String answer = "";
-                for (int i : solutionIndexes) {
-                    if (first) {
-                        first = false;
-                        answer = answer + i;
-                    } else {
-                        answer = answer + " " + i;
+        boolean ambi;
+        for (int task : tasks) {
+            if (ambiguous[task]) {
+                io.println("Ambiguous");
+            } else if (orders[task] != null) {
+                ArrayList<Integer> answer = orders[ task].iterator().next();
+                ambi = false;
+                for(int i = 0; i < answer.size(); i++){
+                    if(answer.get(i) > 0 && menuDuplicates.contains(menu[i])){
+                        ambi = true;
+                        break;
                     }
                 }
-                if (task == tasks.length - 1) {
-                    System.out.print(answer);
-                } else {
-                    System.out.println(answer);
+                if(ambi) {
+                    io.println("Ambiguous");
+                }else{
+                boolean first = true;
+                for (int i = 0; i < answer.size(); i++) {
+                    for (int k = 0; k < answer.get(i); k++) {
+                        if (first) {
+                            first = false;
+                            io.print((i + 1));
+                        } else {
+                            io.print(" " + (i + 1));
+                        }
+                    }
                 }
+                io.println("");
+            }
+            } else {
+                io.println("Impossible");
             }
         }
+        io.close();
     }
-
-    static int[] getAnswer(int sum, int menuIndex, int[] solution) {
-        if (sum < 1) {
-            return solution;
-        }
-        if (dp[menuIndex - 1][sum] == 0) {
-            int newSum = sum - menu[menuIndex - 1];
-            int[] newSolution = new int[solution.length + 1];
-            System.arraycopy(solution, 0, newSolution, 0, solution.length);
-            newSolution[newSolution.length - 1] = menu[menuIndex - 1];
-            return getAnswer(newSum, menu.length, newSolution);
-        }
-        return getAnswer(sum, menuIndex - 1, solution);
-    }
-
     static class Kattio extends PrintWriter {
         public Kattio(InputStream i) {
             super(new BufferedOutputStream(System.out));
@@ -146,15 +171,16 @@ public class RestaurantOrders {
         private String token;
 
         private String peekToken() {
-            if (token == null) try {
-                while (st == null || !st.hasMoreTokens()) {
-                    line = r.readLine();
-                    if (line == null) return null;
-                    st = new StringTokenizer(line);
+            if (token == null)
+                try {
+                    while (st == null || !st.hasMoreTokens()) {
+                        line = r.readLine();
+                        if (line == null) return null;
+                        st = new StringTokenizer(line);
+                    }
+                    token = st.nextToken();
+                } catch (IOException e) {
                 }
-                token = st.nextToken();
-            } catch (IOException e) {
-            }
             return token;
         }
 
@@ -164,5 +190,5 @@ public class RestaurantOrders {
             return ans;
         }
     }
-
 }
+

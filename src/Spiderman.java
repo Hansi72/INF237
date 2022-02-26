@@ -4,19 +4,69 @@ import java.util.*;
 public class Spiderman {
     static Spiderman.Kattio io = new Spiderman.Kattio(System.in, System.out);
     static HashMap<LinkedList<Integer>, int[]> memoized = new HashMap();
+    static int minToZero = 10000;
 
     public static void main(String[] args) {
 
         int tasks = io.getInt();
         for (int i = 0; i < tasks; i++) {
+            minToZero = 10000;
+            memoized.clear();
             int climbs = io.getInt();
             LinkedList<Integer> heights = new LinkedList();
             for (int k = 0; k < climbs; k++) {
-                heights.push(io.getInt());
+                heights.offerLast(io.getInt());
             }
-            printAnswer(climb(heights));
+                printAnswer(climb(heights, heights.peek()));
         }
         io.close();
+    }
+
+    static int[] climb(LinkedList<Integer> heights, int maxSoFar) {
+        if (heights.size() == 1) {
+            if (heights.get(0) == 0) {
+                if (maxSoFar < minToZero) {
+                    minToZero = maxSoFar;
+                }
+                return new int[2];
+            } else {
+                return null;
+            }
+        }
+        if (heights.peek() < 0 || !(maxSoFar <= minToZero)) {
+            return null;
+        }
+        if (memoized.containsKey(heights)) {
+            return memoized.get(heights);
+        }
+
+        LinkedList<Integer> up = new LinkedList();
+        LinkedList<Integer> down = new LinkedList();
+
+        ListIterator iterator = heights.listIterator();
+        while(iterator.hasNext()){
+            int current = (int)iterator.next();
+            up.offerLast(current);
+            down.offerLast(current);
+        }
+        up.push(up.pop() + up.pop());
+        down.push(down.pop() - down.pop());
+
+        int[] result = leastHeighted(climb(down, Math.max(maxSoFar, down.peek())), climb(up, Math.max(maxSoFar, up.peek())));
+
+        if (result == null) {
+            memoized.put(heights, null);
+            return null;
+        }
+
+        memoized.put(heights, new int[result.length + 1]);
+        memoized.get(heights)[0] = heights.peek();
+        for (int i = 0; i < result.length - 1; i++) {
+            memoized.get(heights)[i + 1] = result[i];
+        }
+        memoized.get(heights)[memoized.get(heights).length - 1] = Math.max(heights.peek(), result[result.length - 1]);
+
+        return memoized.get(heights);
     }
 
     static void printAnswer(int[] result) {
@@ -35,48 +85,6 @@ public class Spiderman {
         }
 
     }
-
-    static int[] climb(LinkedList<Integer> heights) {
-        if (heights.size() == 1) {
-            if (heights.get(0) == 0) {
-                int[] returnList = new int[2];
-                returnList[0] = 0;
-                returnList[0] = 0;
-                return returnList;
-            } else {
-                return null;
-            }
-        }
-        if (heights.peek() < 0) {
-            return null;
-        }
-
-        if (memoized.containsKey(heights)) {
-            return memoized.get(heights);
-        }
-
-        LinkedList<Integer> up = new LinkedList((LinkedList) heights.clone());
-        LinkedList<Integer> down = new LinkedList((LinkedList) heights.clone());
-        up.push(up.pop() + up.pop());
-        down.push(down.pop() - down.pop());
-
-        int[] result = leastHeighted(climb(down), climb(up));
-
-        if (result == null) {
-            memoized.put(heights, null);
-            return null;
-        }
-
-        memoized.put(heights, new int[result.length + 1]);
-        memoized.get(heights)[0] = heights.peek();
-        for (int i = 0; i < result.length - 1; i++) {
-            memoized.get(heights)[i + 1] = result[i];
-        }
-        memoized.get(heights)[memoized.get(heights).length - 1] = Math.max(heights.peek(), result[result.length - 1]);
-
-        return memoized.get(heights);
-    }
-
     static int[] leastHeighted(int[] stack1, int[] stack2) {
         if (stack1 == null) {
             return stack2;
