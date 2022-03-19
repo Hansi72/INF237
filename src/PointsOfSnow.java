@@ -21,7 +21,7 @@ public class PointsOfSnow {
         for (int i = 0; i < reportCount + queryCount; i++) {
             if (io.getWord().equals("!")) {
                 int start = io.getInt();
-                int end = io.getInt();
+                int end = io.getInt()-1;
                 int amount = io.getInt();
                 snow(0, start, end, amount, 0, linelandLength-1);
 
@@ -30,31 +30,21 @@ public class PointsOfSnow {
             }
         }
 
-        for (int i = 0; i < lineland.length; i++) {
+        for(int i= 0; i < lineland.length; i++){
             System.out.print(lineland[i] + ", ");
-        }
-        System.out.println("");
-
-
-        for (int i = 0; i < 10; i++) {
-            System.out.print(Query(i) + ", ");
-        }
-        System.out.println("");
-
-        System.out.print(Query(7) + "end");
-
-
+        }System.out.println("");
         io.close();
     }
 
     static long Query(int index) {
         long value = 0;
+        System.out.println("query start. index = " + index);
         if(index <= 3){
             index = index + maxSizeofTree / 2;
         }else{
-            index = GetParent(index + maxSizeofTree / 2 +(index-offsetIndex));
+            index = (index + maxSizeofTree / 2 +(index-offsetIndex)) / 2 - 1;
         }
-        //(int)Math.ceil((double)i / 2 - 1);
+        System.out.println("query end. index = " + index);
         while (index > 0) {
             System.out.println("query: index = " + index + " value at index = " + lineland[index]);
             value = value + lineland[index];
@@ -67,15 +57,12 @@ public class PointsOfSnow {
         if(currRangeStart > end || currRangeEnd < start){
             return;
         }
-        System.out.println("snowing: index = " + index + " currRange = " + currRangeStart + " -> " + currRangeEnd + " adding: " + amount);
         if (index >= lineland.length / 2) {
             lineland[index] = lineland[index] + amount;
-            System.out.println("hit leaf node, returning-------");
             return;
         }
         if (start <= currRangeStart && end >= currRangeEnd) {
             lineland[index] = lineland[index] + amount;
-            System.out.println("hit range hit....returning-------");
             return;
         }
         //check for skewed tree
