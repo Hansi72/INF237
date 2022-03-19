@@ -1,22 +1,26 @@
+import com.sun.tools.javac.Main;
+
 import java.io.*;
 import java.util.*;
 
-public class Detour {
+public class Detour implements Runnable{
     static Detour.Kattio io = new Detour.Kattio(System.in, System.out);
     static Intersection[] intersections;
     static PriorityQueue<Intersection> intersectionQueue = new PriorityQueue(new IntersectionComparator());
-    static boolean pathFound = false;
-    static HashSet<Road> illegalRoads;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        new Thread(null, new Detour(), "Main", 1 << 26).start();
+    }
 
+public void run(){
         int intersectionCount = io.getInt();
         intersections = new Intersection[intersectionCount];
         for (int i = 0; i < intersectionCount; i++) {
             intersections[i] = new Intersection(i);
         }
         int roadCount = io.getInt();
-        int source, destination, distance;
+        int source, destination;
+        long distance;
         for (int i = 0; i < roadCount; i++) {
             source = io.getInt();
             destination = io.getInt();
@@ -25,71 +29,58 @@ public class Detour {
             intersections[destination].roads.add(new Road(source, distance, destination));
         }
         intersections[1].shortestDistance = 0;
-        intersectionQueue.addAll(Arrays.asList(intersections));
+        intersectionQueue.add(intersections[1]);
 
         while (!intersectionQueue.isEmpty()) {
             Intersection currentIntersection = intersectionQueue.poll();
-            //for each road from the current intersection, add up the total distance for the destination.
+            //for each road from the current intersection, add up the total distance for the destination and add it to the queue.
             for (Road road : currentIntersection.roads) {
                 if (currentIntersection.shortestDistance + road.distance < intersections[road.destination].shortestDistance) {
                     intersections[road.destination].shortestDistance = currentIntersection.shortestDistance + road.distance;
                     intersections[road.destination].shortestPath = road;
+                    intersectionQueue.add(intersections[road.destination]);
                 }
             }
-            //todo add "if(changed)" here and in that case change "Queue.isEmpty" for the while loop
-            if (!intersectionQueue.isEmpty()) {
-                intersectionQueue.add(intersectionQueue.poll());
-            }
         }
 
-
-        Intersection cSection = intersections[0];
-        //remove the shortest path from the graph
-        illegalRoads = new HashSet();
-        System.out.print("shortest path: ");
-        while (cSection.id != 1) {
-            illegalRoads.add(cSection.shortestPath);
-            System.out.print(cSection.shortestPath.source + " ");
-            cSection = intersections[cSection.shortestPath.source];
-        }
-        System.out.println("");
-
-        LinkedList<Integer> altPath = new LinkedList<>();
-        findAltPath(intersections[0], altPath);
-
-        if (altPath.size() == 1) {
+        //find alternative path and print answer
+        LinkedList<Intersection> altPath = findAltPath(intersections[0]);
+        if (altPath.isEmpty()) {
             io.print("impossible");
         } else {
-            io.print(altPath.size() + " ");
-            while (altPath.size() > 1) {
-                io.print(altPath.pollLast() + " ");
+            io.print(altPath.size());
+            while (!altPath.isEmpty()) {
+                io.print(" " + altPath.pollLast().id);
             }
-            io.print(altPath.pollLast());
         }
-
-
         io.close();
     }
 
-    static void findAltPath(Intersection intersection, LinkedList<Integer> path) {
-        if (pathFound || intersection.visited) {
-            return;
-        }
-        if (intersection == intersections[1]) {
-            pathFound = true;
-            path.push(intersection.id);
-            return;
-        }
-        path.push(intersection.id);
-        intersection.visited = true;
-        for (Road road : intersection.roads) {
-            System.out.println("at intersection: " + intersection.id + " and road source: " + road.source + " dest: " + road.destination + " shortestPath source: " + intersection.shortestPath.source + " shortestPath destination: " + intersection.shortestPath.destination);
-            if (intersection.shortestPath.source != road.destination || road.destination == intersections[1].id) {
-                //if(pathFound){return;}
-                findAltPath(intersections[road.destination], path);
+    static LinkedList<Intersection> findAltPath(Intersection intersection) {
+        LinkedList<Intersection> path = new LinkedList<>();
+        Intersection currentIntersection;
+        path.push(intersection);
+        boolean foundPath;
+        while (!path.isEmpty()) {
+            currentIntersection = path.peek();
+            currentIntersection.visited = true;
+            foundPath = false;
+            if (currentIntersection.id == 1) {
+                return path;
+            }
+            for (Road road : currentIntersection.roads) {
+                //ignores visited nodes and shortest paths found by dijkstras
+                if (!intersections[road.destination].visited && currentIntersection.shortestPath.source != road.destination) {
+                    path.push(intersections[road.destination]);
+                    foundPath = true;
+                    break;
+                }
+            }
+            if (!foundPath) {
+                path.pop();
             }
         }
-
+        return path;
     }
 
     static class Kattio extends PrintWriter {
@@ -156,12 +147,12 @@ class Intersection {
     int id;
     LinkedList<Road> roads;
     boolean visited;
-    int shortestDistance;
+    long shortestDistance;
     Road shortestPath;
 
     public Intersection(int id) {
         this.id = id;
-        shortestDistance = 500000;
+        shortestDistance = (long)(500000*Math.pow(10, 6));
         visited = false;
         roads = new LinkedList();
     }
@@ -170,9 +161,9 @@ class Intersection {
 class Road {
     int source;
     int destination;
-    int distance;
+    long distance;
 
-    public Road(int destination, int distance, int source) {
+    public Road(int destination, long distance, int source) {
         this.source = source;
         this.destination = destination;
         this.distance = distance;
@@ -182,6 +173,6 @@ class Road {
 class IntersectionComparator implements Comparator<Intersection> {
     @Override
     public int compare(Intersection inter1, Intersection inter2) {
-        return Integer.compare(inter1.shortestDistance, inter2.shortestDistance);
+        return Long.compare(inter1.shortestDistance, inter2.shortestDistance);
     }
 }
