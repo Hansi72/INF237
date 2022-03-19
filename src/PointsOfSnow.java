@@ -4,19 +4,26 @@ import java.util.*;
 public class PointsOfSnow {
     static PointsOfSnow.Kattio io = new PointsOfSnow.Kattio(System.in, System.out);
     static long[] lineland;
+    static int offsetIndex;
+    static int maxSizeofTree;
 
     public static void main(String[] args) {
         int linelandLength = io.getInt();
         int reportCount = io.getInt();
         int queryCount = io.getInt();
+        int HeightOfTree = (int)Math.ceil((Math.log(linelandLength) / Math.log(2)) +1);
+        maxSizeofTree = (int)Math.pow(2, HeightOfTree)-1;
 
-        lineland = new long[linelandLength * 2 - 1];
+        lineland = new long[linelandLength *2-1];
+
+        offsetIndex = (maxSizeofTree+1)/2 - (maxSizeofTree - lineland.length) - 1;
+
         for (int i = 0; i < reportCount + queryCount; i++) {
             if (io.getWord().equals("!")) {
                 int start = io.getInt();
                 int end = io.getInt();
                 int amount = io.getInt();
-                snow(0, start, end, amount, 0, linelandLength - 1);
+                snow(0, start, end, amount, 0, linelandLength-1);
 
             } else {
                 io.println(Query(io.getInt() - 1));
@@ -29,20 +36,27 @@ public class PointsOfSnow {
         System.out.println("");
 
 
-
-        for (int i = 0; i < lineland.length/2+1; i++) {
+        for (int i = 0; i < 10; i++) {
             System.out.print(Query(i) + ", ");
         }
         System.out.println("");
+
+        System.out.print(Query(7) + "end");
+
 
         io.close();
     }
 
     static long Query(int index) {
         long value = 0;
-        index = index + lineland.length / 2;
+        if(index <= 3){
+            index = index + maxSizeofTree / 2;
+        }else{
+            index = GetParent(index + maxSizeofTree / 2 +(index-offsetIndex));
+        }
+        //(int)Math.ceil((double)i / 2 - 1);
         while (index > 0) {
-            //System.out.println("query: index = " + index + " value at index = " + lineland[index]);
+            System.out.println("query: index = " + index + " value at index = " + lineland[index]);
             value = value + lineland[index];
             index = GetParent(index);
         }
@@ -50,7 +64,10 @@ public class PointsOfSnow {
     }
 
     static void snow(int index, int start, int end, int amount, int currRangeStart, int currRangeEnd) {
-        System.out.println("snowing: index = " + index + " currRangeStart = " + currRangeStart + " currRangeEnd = " + currRangeEnd + " adding: " + amount);
+        if(currRangeStart > end || currRangeEnd < start){
+            return;
+        }
+        System.out.println("snowing: index = " + index + " currRange = " + currRangeStart + " -> " + currRangeEnd + " adding: " + amount);
         if (index >= lineland.length / 2) {
             lineland[index] = lineland[index] + amount;
             System.out.println("hit leaf node, returning-------");
@@ -61,26 +78,26 @@ public class PointsOfSnow {
             System.out.println("hit range hit....returning-------");
             return;
         }
-        if (start <= Math.ceil((double)(currRangeEnd + currRangeStart) / 2)) {
+        //check for skewed tree
+        if(currRangeStart <= offsetIndex && currRangeEnd > offsetIndex) {
             //go left
-            snow(GetLeftChild(index), start, end, amount, currRangeStart, (int)Math.ceil((double)(currRangeStart + currRangeEnd) / 2));
-        }
-        if (end > Math.ceil((double)(currRangeEnd + currRangeStart) / 2)) {
+            snow(GetLeftChild(index), start, end, amount, currRangeStart, (currRangeStart + currRangeEnd) / 2 + 1);
             //go right
-            snow(GetRightChild(index), start, end, amount, (int)Math.ceil((double)(currRangeStart + currRangeEnd)/ 2), currRangeEnd);
+            snow(GetRightChild(index), start, end, amount, (currRangeStart + currRangeEnd) / 2 +2, currRangeEnd);
+        }else{
+        //go left
+        snow(GetLeftChild(index), start, end, amount, currRangeStart, (currRangeStart + currRangeEnd) / 2);
+        //go right
+        snow(GetRightChild(index), start, end, amount, (currRangeStart + currRangeEnd) / 2 +1, currRangeEnd);
         }
-
     }
 
     static int GetParent(int i) {
-        if (i == 1) {
-            return 0;
-        }
-        return (int)Math.ceil(((double)i / 2 - 1));
+        return (int)Math.ceil((double)i / 2 - 1);
     }
 
     static int GetRightChild(int i) {
-        return 2 * i + 1 + 1;
+        return 2 * i + 2;
     }
 
     static int GetLeftChild(int i) {
