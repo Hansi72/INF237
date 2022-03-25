@@ -19,7 +19,7 @@ public class ImperfectGPS {
         }
         vector[] GPS = CreateGPSData(track, scalars, interval);
         double realDistance = RunDistance(track);
-        io.print((float)((realDistance - RunDistance(GPS)) / realDistance * 100));
+        io.print(((realDistance - RunDistance(GPS)) / realDistance * 100));
         io.close();
     }
 
@@ -29,7 +29,7 @@ public class ImperfectGPS {
         vector direction = new vector(track[1].x, track[1].y);
         GPSTrack[0] = new vector(0, 0);
         int trackIndex = 1;
-        int dirScale;
+        double dirScale;
 
         for (int GPSIndex = 1; GPSIndex < GPSTrack.length; GPSIndex++) {
             while (scalars[trackIndex] < currentInterval && trackIndex < track.length - 1) {
@@ -55,7 +55,7 @@ public class ImperfectGPS {
         return total;
     }
     static double Dist(vector vector1, vector vector2) {
-        return Math.sqrt(Math.pow((vector1.x - vector2.x), 2) + (Math.pow((vector1.y - vector2.y), 2)));
+        return Math.sqrt((vector1.x - vector2.x)*(vector1.x - vector2.x) + (vector1.y - vector2.y)*(vector1.y - vector2.y));
     }
 
     static class Kattio extends PrintWriter {
