@@ -1,63 +1,69 @@
 import java.io.*;
-import java.util.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.StringTokenizer;
 
 public class test {
     static test.Kattio io = new test.Kattio(System.in, System.out);
-    static int[] movieOrdering;
 
     public static void main(String[] args) {
-        int tasks = io.getInt();
+        int turnCount = io.getInt();
+        int interval = io.getInt();
 
-        //task loop
-        for (int i = 0; i < tasks; i++) {
-            int movieCount = io.getInt();
-            int[] movies = new int[movieCount + 1];
-            movieOrdering = new int[movieCount * 4];
-
-            //init fill
-            for (int j = 1; j < movieCount + 1; j++) {
-                movies[j] = movieCount - j + 1;
-                Update(j, 1);
-            }
-
-            int count = movieCount;
-            int queryCount = io.getInt();
-            for (int k = 0; k < queryCount; k++) {
-
-                count++;
-                int currentMovie = io.getInt();
-                int index = movies[currentMovie];
-                int total = 0;
-
-                //walk up the three while gathering total
-                while (index > 0) {
-                    total = total + movieOrdering[index];
-                    index = GetParent(index);
-                }
-                Update(movies[currentMovie], -1);
-                movies[currentMovie] = count;
-                Update(movies[currentMovie], 1);
-                io.print(movieCount - total + " ");
-            }
-            io.println("");
+        vector[] track = new vector[turnCount];
+        int[] scalars = new int[turnCount];
+        for (int i = 0; i < turnCount; i++) {
+            int x = io.getInt();
+            int y = io.getInt();
+            int scalar = io.getInt();
+            scalars[i] = scalar;
+            track[i] = new vector(x, y);
         }
+
+        vector[] GPS = CreateGPSData(track, scalars, interval);
+        BigDecimal realDistance = RunDistance(track);
+        BigDecimal diff = realDistance.subtract(RunDistance(GPS));
+        io.print((diff.divide(realDistance, 25, RoundingMode.HALF_UP)).multiply(new BigDecimal(100)));
         io.close();
     }
 
-    static void Update(int index, int value) {
-        if (index > movieOrdering.length - 1) {
-            return;
+    static vector[] CreateGPSData(vector[] track, int[] scalars, int interval) {
+        int currentInterval = interval;
+        vector[] GPSTrack = new vector[(int) (Math.ceil((double) scalars[scalars.length - 1] / interval) + 1)];
+        vector direction = new vector(0,0);
+        GPSTrack[0] = new vector(0, 0);
+        int trackIndex = 1;
+        double dirScale;
+        int GPSIndex = 1;
+        while(currentInterval < scalars[scalars.length-1]) {
+            //increase trackIndex until it is above GPS index (to get it between two points)
+            while (scalars[trackIndex] < currentInterval && trackIndex < track.length - 1) {
+                trackIndex++;
+            }
+            //find the vector basis (direction) of the line the GPS point is in between
+            dirScale = (scalars[trackIndex] - scalars[trackIndex - 1]);
+            direction.x = (track[trackIndex].x - track[trackIndex - 1].x) / dirScale;
+            direction.y = (track[trackIndex].y - track[trackIndex - 1].y) / dirScale;
+
+            //add to GPS location
+            GPSTrack[GPSIndex] = new vector(track[trackIndex].x - direction.x * (scalars[trackIndex] - currentInterval), track[trackIndex].y - direction.y * (scalars[trackIndex] - currentInterval));
+            currentInterval = currentInterval + interval;
+            GPSIndex++;
         }
-        movieOrdering[index] = movieOrdering[index] + value;
-        Update(GetNext(index), value);
+        GPSTrack[GPSTrack.length - 1] = new vector(track[track.length - 1].x, track[track.length - 1].y);
+        return GPSTrack;
     }
 
-    static int GetNext(int i) {
-        return i + (-i & i);
+    static BigDecimal RunDistance(vector[] coords) {
+        BigDecimal total = new BigDecimal(0);
+        for (int i = 1; i < coords.length; i++) {
+            total = total.add(Dist(coords[i - 1], coords[i]));
+        }
+        return total;
     }
 
-    static int GetParent(int i) {
-        return i - (-i & i);
+    static BigDecimal Dist(vector vector1, vector vector2) {
+        return new BigDecimal(Math.sqrt((vector1.x - vector2.x) * (vector1.x - vector2.x) + (vector1.y - vector2.y) * (vector1.y - vector2.y)));
     }
 
     static class Kattio extends PrintWriter {
@@ -118,5 +124,16 @@ public class test {
         }
     }
 }
+/*
+class vector {
+    double x;
+    double y;
+
+    vector(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+}
 
 
+ */

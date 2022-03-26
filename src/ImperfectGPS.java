@@ -8,6 +8,7 @@ public class ImperfectGPS {
         int turnCount = io.getInt();
         int interval = io.getInt();
 
+        //get input
         vector[] track = new vector[turnCount];
         int[] scalars = new int[turnCount];
         for (int i = 0; i < turnCount; i++) {
@@ -17,28 +18,38 @@ public class ImperfectGPS {
             scalars[i] = scalar;
             track[i] = new vector(x, y);
         }
+
+        //output
+    if(interval == 1){
+        io.print(0.0);
+    }else{
         vector[] GPS = CreateGPSData(track, scalars, interval);
         double realDistance = RunDistance(track);
-        io.print(((realDistance - RunDistance(GPS)) / realDistance * 100));
+        io.print((double)Math.round((((realDistance - RunDistance(GPS)) / realDistance * 100)) * 100000d) / 100000d);
+    }
         io.close();
     }
 
     static vector[] CreateGPSData(vector[] track, int[] scalars, int interval) {
         int currentInterval = interval;
         vector[] GPSTrack = new vector[(int) (Math.ceil((double) scalars[scalars.length - 1] / interval) + 1)];
-        vector direction = new vector(track[1].x, track[1].y);
-        GPSTrack[0] = new vector(0, 0);
+        vector direction = new vector(0,0);
+        GPSTrack[0] = new vector(track[0].x, track[0].y); //<<<--------------
         int trackIndex = 1;
         double dirScale;
 
+        //for each GPS index to create.
         for (int GPSIndex = 1; GPSIndex < GPSTrack.length; GPSIndex++) {
+            //increase trackIndex until it is above GPS index (to get in between two points in the real track)
             while (scalars[trackIndex] < currentInterval && trackIndex < track.length - 1) {
                 trackIndex++;
             }
+            //find the vector basis (direction) of the line the GPS point is in between
             dirScale = (scalars[trackIndex] - scalars[trackIndex - 1]);
             direction.x = (track[trackIndex].x - track[trackIndex - 1].x) / dirScale;
             direction.y = (track[trackIndex].y - track[trackIndex - 1].y) / dirScale;
 
+            //add to GPS location
             GPSTrack[GPSIndex] = new vector(track[trackIndex].x - direction.x * (scalars[trackIndex] - currentInterval), track[trackIndex].y - direction.y * (scalars[trackIndex] - currentInterval));
             currentInterval = currentInterval + interval;
         }
@@ -54,8 +65,9 @@ public class ImperfectGPS {
         }
         return total;
     }
+
     static double Dist(vector vector1, vector vector2) {
-        return Math.sqrt((vector1.x - vector2.x)*(vector1.x - vector2.x) + (vector1.y - vector2.y)*(vector1.y - vector2.y));
+        return Math.sqrt((vector1.x - vector2.x) * (vector1.x - vector2.x) + (vector1.y - vector2.y) * (vector1.y - vector2.y));
     }
 
     static class Kattio extends PrintWriter {
@@ -126,3 +138,5 @@ class vector {
         this.y = y;
     }
 }
+
+
