@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.*;
 
 public class Mal {
-    static Mal.Kattio io = new Mal.Kattio(System.in, System.out);
+    static WhiteWaterRafting.Kattio io = new WhiteWaterRafting.Kattio(System.in, System.out);
 
     public static void main(String[] args) {
 
