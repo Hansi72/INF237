@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.*;
 
 public class SocialAdvertising {
-    static SocialAdvertising.Kattio io = new SocialAdvertising.Kattio(System.in, System.out);
+    static HoleyNQueens.Kattio io = new HoleyNQueens.Kattio(System.in, System.out);
 
     public static void main(String[] args) {
 
