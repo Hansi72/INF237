@@ -3,28 +3,53 @@ import java.util.*;
 
 public class TheCitrusIntern {
     static TheCitrusIntern.Kattio io = new TheCitrusIntern.Kattio(System.in, System.out);
+    static long[] pick;
+    static long[] skip;
+    static int[] costs;
+    static int[][] subs;
 
     public static void main(String[] args) {
         //setup
         int memberCount = io.getInt();
-        member[] members = new member[memberCount];
+        costs = new int[memberCount];
+        subs = new int[memberCount][];
         for (int i = 0; i < memberCount; i++) {
-            members[i] = new member(io.getInt(), io.getInt()); //(price, subCount)
-            for (int j = 0; j < members[i].subs.length; j++) {
-                members[i].subs[j] = io.getInt();
+            costs[i] = io.getInt();;
+            subs[i] = new int[io.getInt()];
+            for (int j = 0; j < subs[i].length; j++) {
+                subs[i][j] = io.getInt();
             }
         }
         //work
+        pick = new long[memberCount];
+        skip = new long[memberCount];
+
+        work(5);
+
+        io.println(pick[5]);
+        io.println(skip[5]);
+
+
+        io.close();
+
+
 
     }
 
-    static class member {
-        int cost;
-        int[] subs;
-
-        member(int cost, int subs) {
-            this.cost = cost;
-            this.subs = new int[subs];
+    static void work(int member){
+        System.out.println("currently at " + member);
+        //if leaf node
+        if(subs[member].length == 0){
+            pick[member] = costs[member];
+            skip[member] = 0;
+        }else{
+            long sum = 0;
+            for(int sub : subs[member]){
+                work(sub);
+                sum = sum + skip[sub];
+            }
+            pick[member] = sum + costs[member];
+            skip[member] = Math.max(pick[member], sum);
         }
     }
 
