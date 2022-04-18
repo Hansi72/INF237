@@ -12,7 +12,8 @@ public class PokemonGoGo {
         int stopCount = io.getInt();
         pokestops = new pokestop[stopCount];
         pokemons = new String[stopCount];
-        int[][] DP = new int[(int) Math.pow(2, stopCount)][stopCount];
+        int[][] DP = new int[1 << stopCount][stopCount];
+        int[][] distances = new int[stopCount][stopCount];
 
         int x;
         int y;
@@ -24,66 +25,63 @@ public class PokemonGoGo {
             pokestops[i] = new pokestop(x, y);
             pokemons[i] = pokemon;
         }
-
         //fill array of the empty subset
         for (int i = 0; i < stopCount; i++) {
-            DP[0][i] = pokestops[i].x + pokestops[i].y;
+            DP[0][i] = Math.abs(pokestops[i].x) + Math.abs(pokestops[i].y);
+        }
+        //precompute distances
+        for (int i = 0; i < distances.length; i++) {
+            for (int j = 0; j < distances.length; j++) {
+                distances[i][j] = distance(i, j);
+            }
         }
 
         int subset = 1;
         int subsetMax = FlipBit(0, pokestops.length);
-
         int subSubset;
         int minimum;
-        //loop through all subsets
+
+        //loop through all subsets in increasing order of bits set.
         while (subset < subsetMax) {
             for (int j = 0; j < pokestops.length; j++) {
 
                 minimum = 100000;
                 for (int v = 0; v < pokestops.length; v++) {
-                    //todo
-                        if (TestBit(subset, v) == 1 && v != j) {
-                            //if(!pokemons[j].equals(pokemons[v])) {
-                                subSubset = FlipBit(subset, v);
-                                minimum = Math.min(minimum, DP[subSubset][v] + distance(v, j));
-                            //}
-                        }
+                    if (TestBit(subset, v) == 1) {
+                        subSubset = FlipBit(subset, v);
+                        minimum = Math.min(minimum, DP[subSubset][v] + distances[v][j]);
+                    }
                 }
                 DP[subset][j] = minimum;
             }
             subset = NextPermutation(subset, subsetMax);
         }
-        for(int i = DP.length-1; i > 20; i--) {
-            System.out.println(DP[i][pokestops.length-1]);
-        }
 
-
-        //Test possible solution subsets of bitlength = unique pokemons
+        //DP array complete
+        //get unique pokemon count
         Set<String> pokeSet = new HashSet<String>();
         for (int i = 0; i < pokemons.length; i++) {
             pokeSet.add(pokemons[i]);
         }
         int uniquePokemons = pokeSet.size();
-        int solutionSet = 0;
-        for (int i = 0; i < uniquePokemons; i++) {
-            solutionSet = FlipBit(solutionSet, i);
-        }
-        int max = FlipBit(0, pokestops.length-1);
-        int min = 10000;
-        //loop through solutions and take the minimum of valid solutions
-        while (solutionSet < max) {
-            if (ValidSolution(solutionSet, uniquePokemons)) {
-                min = Math.min(min, DP[FlipBit(solutionSet >> 1, pokestops.length-1)][pokemons.length]);
+
+        minimum = 100000;
+        int lowestSolution = 1 << uniquePokemons-1;
+        //Loop through 'all' possible solutions and take the minimum of valid ones.
+        for (int i = lowestSolution; i < DP.length; i++) {
+            if (ValidSolution(i, uniquePokemons)) {
+                for (int j = 0; j < pokestops.length; j++) {
+                    minimum = Math.min(minimum, DP[i][j] + Math.abs(pokestops[j].x) + Math.abs(pokestops[j].y));
+                }
             }
-            solutionSet = NextPermutation(solutionSet, max);
         }
-        io.println(min);
+        io.println(minimum);
         io.close();
     }
 
     static boolean ValidSolution(int subset, int uniqueCount) {
         HashSet<String> set = new HashSet();
-        for (int i = 0; i < pokestops.length - 1; i++) {
+        for (int i = 0; i < pokestops.length; i++) {
             if (TestBit(subset, i) == 1) {
                 set.add(pokemons[i]);
             }

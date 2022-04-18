@@ -8,21 +8,9 @@ public class test {
 
     public static void main(String[] args) {
 
-        int subset = 1;
-        int subsetBitCount;
-        int subsetMax;
-
-
-
-        subsetBitCount = Integer.bitCount(subset);
-        subsetMax = 0;
-            subsetMax = FlipBit(0, 4-1);
-
-        System.out.println("subsetMax: "+ subsetMax);
-        while(subset < subsetMax){
-            subset = NextPermutation(subset, subsetMax);
-            System.out.println(subset);
-        }
+        int test = 8;
+        int test2 = ~test << 1;
+        System.out.println(test2);
 
 
 
@@ -111,3 +99,24 @@ public class test {
 
 
 
+/*
+//Test possible solution subsets of bitlength = unique pokemons
+        Set<String> pokeSet = new HashSet<String>();
+        for (int i = 0; i < pokemons.length; i++) {
+            pokeSet.add(pokemons[i]);
+        }
+        int uniquePokemons = pokeSet.size();
+        int solutionSet = 0;
+        for (int i = 0; i < uniquePokemons; i++) {
+            solutionSet = FlipBit(solutionSet, i);
+        }
+        int max = FlipBit(0, pokestops.length-1);
+        int min = 10000;
+        //loop through solutions and take the minimum of valid solutions
+        while (solutionSet < max) {
+            if (ValidSolution(solutionSet, uniquePokemons)) {
+                min = Math.min(min, DP[FlipBit(solutionSet >> 1, pokestops.length-1)][pokemons.length]);
+            }
+            solutionSet = NextPermutation(solutionSet, max);
+        }
+ */
