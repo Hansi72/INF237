@@ -8,22 +8,40 @@ public class test {
 
     public static void main(String[] args) {
 
-        int testint = 8;
+        int subset = 1;
+        int subsetBitCount;
+        int subsetMax;
 
 
-        for(int i = 5; i > -1; i--){
-            System.out.print(TestBit(testint, i));
+
+        subsetBitCount = Integer.bitCount(subset);
+        subsetMax = 0;
+            subsetMax = FlipBit(0, 4-1);
+
+        System.out.println("subsetMax: "+ subsetMax);
+        while(subset < subsetMax){
+            subset = NextPermutation(subset, subsetMax);
+            System.out.println(subset);
         }
 
-        testint = FlipBit(testint, 4);
 
-        System.out.println();
-        for(int i = 5; i > -1; i--){
-            System.out.print(TestBit(testint, i));
-        }
+
 
     }
+    static int NextPermutation(int n, int max) {
+        int c = n & -n;
+        int r = n + c;
+        int result = (((r ^ n) >>> 2) / c) | r;
+        if (result >= max) {
+            int bitCount = Integer.bitCount(n);
+            result = 0;
+            for (int i = 0; i < bitCount + 1; i++) {
+                result = FlipBit(result, i);
+            }
+        }
 
+        return result;
+    }
     static int FlipBit(int bits, int bit) {
         return bits ^ (1 << bit);
     }
