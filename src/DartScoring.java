@@ -8,23 +8,14 @@ public class DartScoring {
     public static void main(String[] args) {
         double[] inputLine;
         vector[] darts;
+        int dartCount;
         while (io.hasMoreTokens()) {
             inputLine = Arrays.stream(io.line.split(" ")).mapToDouble(Double::parseDouble).toArray();
             darts = new vector[inputLine.length / 2];
             for (int i = 0; i < darts.length; i++) {
                 darts[i] = new vector(io.getDouble(), io.getDouble());
             }
-
-            //remove duplicates
-            Set<vector> dupSet = new HashSet<>();
-            for(int i = 0; i < darts.length; i++){
-                dupSet.add(darts[i]);
-            }
-            if(dupSet.size() != darts.length){
-                darts = removeDuplicates(darts);
-            }
-
-
+            dartCount = darts.length;
             //find the lowest Y coordinate
             int minY = 0;
             for (int i = 1; i < darts.length; i++) {
@@ -34,26 +25,12 @@ public class DartScoring {
             }
             P = darts[minY];
 
-
-
-
-/*
-            if(darts.length == 3){
-                Stack<vector> dartStack = new Stack<>();
-                for(int i = 0; i < darts.length; i++){
-                    dartStack.add(darts[i]);
-                }
-                io.println(calculateScore(dartStack ,darts.length));
-                io.close();
-                return;
-            }*/
-
-
             //Sort by increasing order of angles with P as a base
             Arrays.sort(darts, new CompareByYCord());
 
+            darts = RemoveDuplicates(darts);
 
-            //todo comment
+            //pop() all points that create the middle point of a left turn of three points
             Stack<vector> dartStack = new Stack<>();
             for (int i = 0; i < darts.length; i++) {
                 while (dartStack.size() > 1 && LeftTurn(nextToTop(dartStack), dartStack.peek(), darts[i])) {
@@ -62,9 +39,31 @@ public class DartScoring {
                 dartStack.push(darts[i]);
             }
 
-            io.println(calculateScore(dartStack, darts.length));
+            io.println(calculateScore(dartStack, dartCount));
         }
         io.close();
+    }
+
+    static class CompareByYCord implements Comparator<vector> {
+        @Override
+        public int compare(vector v1, vector v2) {
+            if (v2 == P) {
+                return -1;
+            }
+            if (LeftTurn(P, v1, v2) || v1 == P) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }
+    }
+
+    static boolean LeftTurn(vector v1, vector v2, vector v3) {
+        if ((v2.x - v1.x) * (v3.y - v1.y) - (v2.y - v1.y) * (v3.x - v1.x) < 0.0001) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     static double dist(vector v1, vector v2) {
@@ -87,14 +86,6 @@ public class DartScoring {
         return result;
     }
 
-    static boolean LeftTurn(vector v1, vector v2, vector v3) {
-        if (((v2.y - v1.y) * (v3.x - v2.x) - (v2.x - v1.x) * (v3.y - v2.y)) < 0) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
     static class vector {
         double x;
         double y;
@@ -105,18 +96,17 @@ public class DartScoring {
         }
     }
 
-    static class CompareByYCord implements Comparator<vector> {
-        @Override
-        public int compare(vector v1, vector v2) {
-            if (v2 == P) {
-                return -1;
-            }
-            if (LeftTurn(P, v1, v2) || v1 == P) {
-                return 1;
-            } else {
-                return -1;
-            }
-        }
+    static vector[] RemoveDuplicates(vector[] darts) {
+            LinkedList<vector> collect = new LinkedList<>();
+            int index = 0;
+                while(index < darts.length) {
+                    while (index < darts.length-1 && darts[index].x == darts[index + 1].x && darts[index].y == darts[index + 1].y) {
+                        index++;
+                    }
+                    collect.add(darts[index]);
+                    index++;
+                }
+        return collect.toArray(new vector[0]);
     }
 
     static class Kattio extends PrintWriter {
