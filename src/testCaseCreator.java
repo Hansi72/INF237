@@ -2,6 +2,30 @@ public class testCaseCreator {
 
 
 
+    public static class RobertHood{
+        public int n;
+        public int[] x;
+        public int[] y;
+
+        public RobertHood(){
+            int n = 100000;
+            int[] x = new int[n];
+            int[] y = new int[n];
+            int max = 2000;
+            int min = 0;
+            int range = max - min;
+            for(int i = 0; i < n; i++){
+                x[i] = (int)((Math.random() * range) + min-1000);
+                y[i] = (int)((Math.random() * range) + min-1000);
+            }
+            this.x = x;
+            this.y = y;
+            this.n = n;
+        }
+    }
+
+
+
     public class Detour {
         public int n;
         public int m;
@@ -9,7 +33,6 @@ public class testCaseCreator {
 
 
         public Detour(){
-
         }
 
     }
