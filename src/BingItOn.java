@@ -5,7 +5,7 @@ public class BingItOn {
     static BingItOn.Kattio io = new BingItOn.Kattio(System.in, System.out);
 
     public static void main(String[] args) {
-        Node root = new Node('*', null);
+        Node root = new Node('*');
         int wordCount = io.getInt();
 
         //create trie and set amount of words in subtrees. Output solutions while building trie.
@@ -16,7 +16,7 @@ public class BingItOn {
             currentNode = root;
             for (int j = 0; j < wordInput.length(); j++) {
                 if (!currentNode.children.containsKey(wordInput.charAt(j))) {
-                    currentNode.children.put(wordInput.charAt(j), new Node(wordInput.charAt(j), currentNode));
+                    currentNode.children.put(wordInput.charAt(j), new Node(wordInput.charAt(j)));
                 }
                 currentNode = currentNode.children.get(wordInput.charAt(j));
                 currentNode.subWords++;
@@ -31,13 +31,11 @@ public class BingItOn {
     static class Node {
         char letter;
         HashMap<Character, Node> children;
-        Node parent;
         int subWords = 0;
 
-        public Node(char letter, Node parent) {
+        public Node(char letter) {
             this.letter = letter;
             children = new HashMap<>();
-            this.parent = parent;
         }
     }
 
