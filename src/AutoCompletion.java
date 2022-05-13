@@ -5,7 +5,7 @@ public class AutoCompletion {
     static AutoCompletion.Kattio io = new AutoCompletion.Kattio(System.in, System.out);
 
     public static void main(String[] args) {
-        Node root = new Node('*', null);
+        Node root = new Node('*', null, 0);
         int dictCount = io.getInt();
 
         //create trie from dictionary and add amount of words in subtrees
@@ -16,16 +16,15 @@ public class AutoCompletion {
             currentNode = root;
             for (int j = 0; j < wordInput.length(); j++) {
                 if (!currentNode.children.containsKey(wordInput.charAt(j))) {
-                    currentNode.children.put(wordInput.charAt(j), new Node(wordInput.charAt(j), currentNode));
+                    currentNode.children.put(wordInput.charAt(j), new Node(wordInput.charAt(j), currentNode, j+1));
                 }
                 currentNode = currentNode.children.get(wordInput.charAt(j));
                 currentNode.subWords++;
                 if (j == wordInput.length() - 1) {
-                    currentNode.children.put('*', new Node('*', currentNode));
+                    currentNode.children.put('*', new Node('*', currentNode, j+1));
                 }
             }
         }
-        //todo bytt til LinkedhashMap og sorter EN gang
 
         //tasks
         StringBuilder suffix = new StringBuilder();
@@ -45,7 +44,7 @@ public class AutoCompletion {
                         j++;
                     }
                     //ignore direct '*' child. (current word)
-                    if (currentNode.children.containsKey('*')) {
+                    if (currentNode.children.firstKey() == '*') {
                         tabCount++;
                     }
                     tabCount = ((tabCount - 1) % currentNode.subWords) + 1;
@@ -55,8 +54,8 @@ public class AutoCompletion {
                         currentNode = currentNode.children.get(wordInput.charAt(j));
                     } else {
                         //no more autocompletion can be done, add rest of string to suffix(except '#')
-                        while (j < wordInput.length()) {
-                            if (wordInput.charAt(j) != '#') {
+                        while(j < wordInput.length()) {
+                            if(wordInput.charAt(j) != '#') {
                                 suffix.append(wordInput.charAt(j));
                             }
                             j++;
@@ -85,27 +84,18 @@ public class AutoCompletion {
         return autoComplete(currentChild, tabCount - (totalSubWords - currentChild.subWords));
     }
 
-    static Node find(Node currentNode, String word, int wordIndex) {
-        if (wordIndex > word.length() - 1) {
-            return currentNode;
-        }
-        if (currentNode.children.containsKey(word.charAt(wordIndex))) {
-            return find(currentNode.children.get(word.charAt(wordIndex)), word, ++wordIndex);
-        } else {
-            return null;
-        }
-    }
-
     static class Node {
         char letter;
-        HashMap<Character, Node> children;
+        TreeMap<Character, Node> children;
         Node parent;
         int subWords = 0;
+        int depth;
 
-        public Node(char letter, Node parent) {
+        public Node(char letter, Node parent, int depth) {
             this.letter = letter;
-            children = new HashMap<>();
+            children = new TreeMap<>();
             this.parent = parent;
+            this.depth = depth;
             if (letter == '*') {
                 subWords++;
             }
@@ -113,16 +103,13 @@ public class AutoCompletion {
     }
 
     static String getWord(Node node) {
-        StringBuilder solution = new StringBuilder();
+        char[] solution = new char[node.depth];
         Node currentNode = node;
-        while (currentNode.letter != '*') {
-            solution.insert(0, currentNode.letter);
+        for(int i = 0; i < solution.length; i++){
+            solution[solution.length-i-1] = currentNode.letter;
             currentNode = currentNode.parent;
         }
-        if (solution.toString() == "") {
-            return "";
-        }
-        return solution.toString();
+        return String.valueOf(solution);
     }
 
     static class Kattio extends PrintWriter {
@@ -183,5 +170,3 @@ public class AutoCompletion {
         }
     }
 }
-
-
