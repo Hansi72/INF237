@@ -1,38 +1,22 @@
 import java.io.*;
+import java.math.BigInteger;
 import java.util.*;
 
-public class SemiPrimeHNumbers {
-    static SemiPrimeHNumbers.Kattio io = new SemiPrimeHNumbers.Kattio(System.in, System.out);
+public class IHateTheNumberNine {
+    static IHateTheNumberNine.Kattio io = new IHateTheNumberNine.Kattio(System.in, System.out);
 
     public static void main(String[] args) {
-        int input = io.getInt();
-        boolean[] sieve;
-        while(input != 0){
-            sieve = new boolean[(input-1)/4];
-            for(int i = 1; i < sieve.length; i++){
-                if(!sieve[i]){
-                    int multiple = 2;
-                    while(multiple*(4*i+1) < input){
-                        System.out.println("setting non prime " + multiple*(4*i+1) + " index " + (multiple*(4*i+1)-1)/4);
-                        sieve[(multiple*(4*i+1)-1)/4] = true;
-                        multiple++;
-                    }
-                }
-            }
-            //sieve of eratosthenes complete
+        int testCases = io.getInt();
+        long digits;
+        BigInteger answer;
+        BigInteger modulus = BigInteger.valueOf(1000000007);
 
-
-
-
-
-
-
-            input = io.getInt();
+        for (int i = 0; i < testCases; i++) {
+            digits = io.getLong();
+            answer = BigInteger.valueOf(9).modPow(BigInteger.valueOf(digits-1), modulus);
+            answer = answer.multiply(BigInteger.valueOf(8)).mod(modulus);
+            io.println(answer);
         }
-
-
-
-
         io.close();
     }
 
