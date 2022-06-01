@@ -4,6 +4,13 @@ import java.util.StringTokenizer;
 public class ImperfectGPS {
     static ImperfectGPS.Kattio io = new ImperfectGPS.Kattio(System.in, System.out);
 
+
+    /*
+    finn 2 punkter sånn at GPSen er i mellom disse punktene, finn ut retningen på disse punktene.
+    finner ut retningen av løperen og beregner hvor langt hen har kommet når GPSen ticker.
+     */
+
+
     public static void main(String[] args) {
         int turnCount = io.getInt();
         int interval = io.getInt();

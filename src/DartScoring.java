@@ -5,6 +5,16 @@ public class DartScoring {
     static DartScoring.Kattio io = new DartScoring.Kattio(System.in, System.out);
     static vector P;
 
+    /*
+    finner convex hull og regner ut lengden av denne.
+
+    begynner med å finne laveste left most point.
+    sorterer alle punkter i forhold til vinkelen til startpunktet.
+    sjekk 3 punkter om gangen, hvis dette skaper en venstresving, pop midtpunktet.
+     */
+
+
+
     public static void main(String[] args) {
         double[] inputLine;
         vector[] darts;

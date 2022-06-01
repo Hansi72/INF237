@@ -8,6 +8,12 @@ public class BingItOn {
         Node root = new Node('*');
         int wordCount = io.getInt();
 
+        /*
+        enkel trie.
+        bygger treet mens man går gjennom tasks.
+        outputter antall subwords
+         */
+
         //create trie and set amount of words in subtrees. Output solutions while building trie.
         String wordInput;
         Node currentNode;

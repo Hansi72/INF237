@@ -11,6 +11,7 @@ public class IHateTheNumberNine {
         BigInteger answer;
         BigInteger modulus = BigInteger.valueOf(1000000007);
 
+        //kombinatorikk (9^digits-1)*8 (mod modulus) for hver digit har man 9 mulige tall å velge mellom utenom første (fordi 0 ikke er positiv)
         for (int i = 0; i < testCases; i++) {
             digits = io.getLong();
             answer = BigInteger.valueOf(9).modPow(BigInteger.valueOf(digits-1), modulus);

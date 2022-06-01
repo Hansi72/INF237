@@ -8,6 +8,17 @@ public class AutoCompletion {
         Node root = new Node('*', null, 0);
         int dictCount = io.getInt();
 
+        /*
+        Trie. et tree der bokstavene nedover i treet lager ord. ord ender med en *
+
+        beveger seg nedover treet til man møter en #, teller disse og autocompleter. beveger seg til autocompleted word.
+        for å finne ordet man er på, så går man oppover treet mens man henter bokstavene. (derfor depth)
+
+
+        lagrer også antall subwords sånn at man vet hvor man skal gå når man autocompleter.
+         */
+
+
         //create trie from dictionary and add amount of words in subtrees
         String wordInput;
         Node currentNode;
