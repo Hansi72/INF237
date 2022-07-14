@@ -5,21 +5,6 @@ public class RobertHood {
     static RobertHood.Kattio io = new RobertHood.Kattio(System.in, System.out);
     static vector P;
 
-    /*
-    finner convex hull og regner ut lengden av denne.
-
-    begynner med å finne laveste left most point.
-    sorterer alle punkter i forhold til vinkelen til startpunktet. (her regner den også ut selve angle)
-    sjekk 3 punkter om gangen, hvis dette skaper en venstresving, pop midtpunktet.
-
-
-    etter å ha funnet convex hull.
-
-    for alle points i convex hull.
-    fortsett å sjekk distanser til punkter frem til distansen begynner å minske (da har man gått forbi det lengste)
-     */
-
-
     public static void main(String[] args) {
         int dartCount = io.getInt();
         vector[] darts = new vector[dartCount];

@@ -11,13 +11,6 @@ public class SemiPrimeHNumbers {
         int currentInput = io.getInt();
         int index = 0;
 
-
-        /*
-        sieve of eratosthenes på H numbers
-deretter finn to primes j + i og sett index j+i som semiprime
-         */
-
-
         //gather all inputs to find max input.
         while (currentInput != 0) {
             input[index] = currentInput;

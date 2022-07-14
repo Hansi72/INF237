@@ -5,12 +5,6 @@ public class PianoLessons {
     static PianoLessons.Kattio io = new PianoLessons.Kattio(System.in, System.out);
     static boolean[][] G;
 
-    /*
-    disse flow greiene.
-    mens det finnes paths til slutten
-    når man ender på slutten, lag en path baklengs tilbake til der man kom fra. (da kan andre bruke denne pathen til å komme seg til slutten)
-     */
-
     public static void main(String[] args) {
 
         int studentCount = io.getInt();
