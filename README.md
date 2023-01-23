@@ -1,5 +1,5 @@
 
-|Kattis|Solution|Category|Difficulty(1-10)|Top 10(java)|
+|Kattis|Solution|Category|Difficulty(1-10)|Rank(Top 10 Java)|
 | ---- | ------ |----------|--------|-----|
 |[PokemonGoGo](https://open.kattis.com/problems/pokemongogo)|[PokemonGoGo](src/PokemonGoGo.java)|Dynamic programming|5.4||
 |[RestaurantOrders](https://open.kattis.com/problems/orders)|[RestaurantOrders](src/RestaurantOrders.java)|Dynamic programming|5.4||
