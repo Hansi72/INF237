@@ -2,7 +2,6 @@
 |Kattis|Solution|Difficulty|Category|Notes|
 | ---- | ------ |----------|--------|-----|
 |[ArmCoordination](https://open.kattis.com/problems/armcoordination)|[ArmCoordination](src/ArmCoordination.java)|1.7|category|notes
-
 |[AutoCompletion](https://open.kattis.com/problems/AutoCompletion)|[AutoCompletion](src/AutoCompletion.java)|difficulty|category|notes
 
 |[BingItOn](https://open.kattis.com/problems/bingiton)|[BingItOn](src/BingItOn.java)|difficulty|category|notes
