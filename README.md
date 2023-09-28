@@ -21,7 +21,7 @@
 |[SemiPrimeHNumbers](https://open.kattis.com/problems/hnumbers)|[SemiPrimeHNumbers.java](src/SemiPrimeHNumbers.java)|Mathematics|5.1|
 |[IHateTheNumberNine](https://open.kattis.com/problems/nine)|[IHateTheNumberNine.java](src/IHateTheNumberNine.java)|Mathematics|3.2|
 |[MovieCollection](https://open.kattis.com/problems/moviecollection)|[MovieCollection.java](src/MovieCollection.java)|Segment trees|5|
-|[PointsOfSnow](https://uib.kattis.com/courses/INF237/spring22/assignments/vgq568/problems/uib.pointsofsnow)|[PointsOfSnow.java](src/PointsOfSnow.java)|Segment trees||7|
+|[PointsOfSnow](https://uib.kattis.com/courses/INF237/spring22/assignments/vgq568/problems/uib.pointsofsnow)|[PointsOfSnow.java](src/PointsOfSnow.java)|Segment trees||
 |[Firefly](https://open.kattis.com/problems/firefly)|[Firefly.java](src/Firefly.java)|Sliding,  searching, sorting|3.6|
 |[TiredTerry](https://open.kattis.com/problems/tiredterry)|[TiredTerry.java](src/TiredTerry.java)|Sliding, searching, sorting|3.3|
 |[AutoCompletion](https://open.kattis.com/problems/autocompletion)|[AutoCompletion.java](src/AutoCompletion.java)|Strings|6|
